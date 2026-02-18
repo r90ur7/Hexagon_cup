@@ -20,7 +20,7 @@ class _TournamentListPageState extends State<TournamentListPage> {
   @override
   void initState() {
     super.initState();
-    context.read<TournamentCubit>().loadTournaments();
+    context.read<TournamentCubit>().watchTournaments();
     context.read<TournamentCubit>().fetchTeams();
   }
 

@@ -252,8 +252,12 @@ class ProfilePage extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
-              Navigator.pop(ctx);
+              Navigator.pop(ctx); // fecha o diálogo
               await sl<AuthRepository>().logout();
+              if (context.mounted) {
+                // Limpa toda a pilha de navegação e volta pro root (StreamBuilder)
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
             },
             child: const Text('Sair'),
           ),

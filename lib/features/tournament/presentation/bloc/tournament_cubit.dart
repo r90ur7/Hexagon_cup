@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admissao_app/features/tournament/data/models/tournament_model.dart';
 import 'package:admissao_app/features/tournament/domain/usecases/calculate_standings.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +29,7 @@ class TournamentCubit extends Cubit<TournamentState> {
   List<Team> get allTeamsFromDb => _allTeamsFromDb;
   List<Tournament> _tournaments = [];
   List<Tournament> get tournaments => _tournaments;
+  StreamSubscription<List<Tournament>>? _tournamentsSub;
   // Getters para facilitar filtros na UI
   List<Tournament> get startedTournaments => _tournaments
       .where((t) => t.effectiveStatus == TournamentStatus.started)
@@ -254,7 +257,24 @@ class TournamentCubit extends Cubit<TournamentState> {
     }
   }
 
+  /// Escuta torneios em tempo real via stream do Firestore
+  void watchTournaments() {
+    _tournamentsSub?.cancel();
+    emit(TournamentLoading());
+    _tournamentsSub = repository.watchTournaments().listen(
+      (list) {
+        _tournaments = list;
+        emit(TournamentSuccess(_tournaments));
+      },
+      onError: (e) {
+        emit(TournamentError("Erro ao carregar torneios: $e"));
+      },
+    );
+  }
+
   Future<void> loadTournaments() async {
+    // Se já está escutando via stream, apenas dispara um refresh
+    if (_tournamentsSub != null) return;
     emit(TournamentLoading());
     try {
       _tournaments = await repository.getAllTournaments();
@@ -262,6 +282,12 @@ class TournamentCubit extends Cubit<TournamentState> {
     } catch (e) {
       emit(TournamentError("Erro ao carregar torneios: $e"));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _tournamentsSub?.cancel();
+    return super.close();
   }
 
   Future<void> renameTournament(String tournamentId, String newName) async {
