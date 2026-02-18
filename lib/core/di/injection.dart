@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:admissao_app/core/network/network_info.dart';
 import 'package:admissao_app/core/constants/api_constants.dart';
@@ -17,11 +18,16 @@ import 'package:admissao_app/features/tournament/domain/usecases/calculate_stand
 import 'package:admissao_app/features/tournament/domain/usecases/generate_groups_usecase.dart';
 import 'package:admissao_app/features/tournament/domain/usecases/generate_knockout_bracket.dart';
 import 'package:admissao_app/features/tournament/presentation/bloc/tournament_cubit.dart';
+import 'package:admissao_app/features/auth/data/repositories/auth_repository.dart';
 
 final sl = GetIt.instance;
 
 /// Configura todas as dependências da aplicação via Service Locator (GetIt).
 Future<void> init() async {
+  // ── Auth ────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton(() => FirebaseAuth.instance);
+  sl.registerLazySingleton(() => AuthRepository(sl()));
+
   // ── Tournament ──────────────────────────────────────────────────────────
   sl.registerFactory(
     () => TournamentCubit(

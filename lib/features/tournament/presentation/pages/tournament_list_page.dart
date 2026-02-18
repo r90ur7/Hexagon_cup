@@ -1,4 +1,5 @@
 import 'package:admissao_app/core/styles/app_theme.dart';
+import 'package:admissao_app/features/auth/presentation/profile_page.dart';
 import 'package:admissao_app/features/tournament/domain/entities/tournament.dart';
 import 'package:admissao_app/features/tournament/presentation/pages/tournament_datail_page.dart';
 import 'package:admissao_app/features/tournament/presentation/pages/tournament_management_page.dart';
@@ -55,6 +56,26 @@ class _TournamentListPageState extends State<TournamentListPage> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: HexColors.cardHighlight,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: HexColors.border),
+              ),
+              child: const Icon(
+                Icons.person_outline,
+                color: HexColors.primary,
+                size: 20,
+              ),
+            ),
+            tooltip: 'Meu Perfil',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            ),
+          ),
           IconButton(
             icon: Container(
               padding: const EdgeInsets.all(6),

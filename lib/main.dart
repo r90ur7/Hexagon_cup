@@ -1,7 +1,10 @@
 import 'package:admissao_app/core/di/injection.dart' as di;
+import 'package:admissao_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:admissao_app/features/auth/presentation/auth_page.dart';
 import 'package:admissao_app/features/tournament/presentation/bloc/tournament_cubit.dart';
 import 'package:admissao_app/features/tournament/presentation/pages/tournament_list_page.dart';
 import 'package:admissao_app/core/styles/app_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,7 +29,20 @@ class MyApp extends StatelessWidget {
         title: 'Hexagon Cup Manager',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
-        home: const TournamentListPage(),
+        home: StreamBuilder<User?>(
+          stream: di.sl<AuthRepository>().authStateChanges,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasData) {
+              return const TournamentListPage();
+            }
+            return const AuthPage();
+          },
+        ),
       ),
     );
   }
